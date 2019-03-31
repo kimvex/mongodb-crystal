@@ -1,11 +1,14 @@
 name: mongo
-version: 0.1.0
+version: 0.1.1
 
 authors:
   - Jerome Gravel-Niquet <jeromegn@gmail.com>
 
+contributors:
+  - Benjamin De la cruz <chomi.numb.94@gmail.com>
+
 description: |
-  Bindings for MongoDB C Driver.
+  Library for Mongodb Driver of C.
 
 libraries:
   libmongoc: 1.1.0

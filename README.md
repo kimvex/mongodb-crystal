@@ -1,10 +1,12 @@
-# mongo.cr
+# mongodb-crystal
+
+This repository is a fork of [datanoise/mongo.cr](https://github.com/datanoise/mongo.cr) to keep the Mongo db connection library up-to-date
 
 This library provides binding for MongoDB C Driver. The goal is to provide a driver to access MongoDB.
 
 # Status
 
-*Beta*
+_Beta_
 
 # Requirements
 
@@ -22,14 +24,6 @@ On Linux you need to install `libmongoc-1.1-0` and `libbson-1.1-0` from your pac
 
 [http://mongoc.org/libmongoc/current/installing.html](http://mongoc.org/libmongoc/current/installing.html)
 
-```
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.1.0/mongo-c-driver-1.1.0.tar.gz
-tar -zxvf mongo-c-driver-1.1.0.tar.gz && cd mongo-c-driver-1.1.0/
-./configure --prefix=/usr --libdir=/usr/lib64
-make
-sudo make install
-```
-
 On Linux/Ubuntu
 
 ```
@@ -42,7 +36,7 @@ Add this to your application's `shard.yml`:
 
 ```yaml
 mongo:
-  github: datanoise/mongo.cr
+  github: kimvex/mongodb-crystal
   branch: master
 ```
 
