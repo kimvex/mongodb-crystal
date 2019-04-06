@@ -137,14 +137,14 @@ class BSON
 
   def []=(key, value : Binary)
     LibBSON.bson_append_binary(handle, key, key.bytesize,
-                               value.to_raw_type, value.data, value.data.size)
+      value.to_raw_type, value.data, value.data.size)
   end
 
   def []=(key, value : Bool)
     LibBSON.bson_append_bool(handle, key, key.bytesize, value)
   end
 
-  def []=(key, value : Float64|Float32)
+  def []=(key, value : Float64 | Float32)
     LibBSON.bson_append_double(handle, key, key.bytesize, value.to_f64)
   end
 
@@ -173,7 +173,7 @@ class BSON
   end
 
   def []=(key, value : Time)
-    LibBSON.bson_append_date_time(handle, key, key.bytesize, value.to_utc.epoch * 1000)
+    LibBSON.bson_append_date_time(handle, key, key.bytesize, value.to_utc.to_unix * 1000)
   end
 
   def []=(key, value : Timestamp)
@@ -210,7 +210,7 @@ class BSON
   end
 
   def append_document(key)
-    child_handle = LibBSON.bson_new()
+    child_handle = LibBSON.bson_new
     unless LibBSON.bson_append_document_begin(handle, key, key.bytesize, child_handle)
       return false
     end
@@ -224,7 +224,7 @@ class BSON
   end
 
   def append_array(key)
-    child_handle = LibBSON.bson_new()
+    child_handle = LibBSON.bson_new
     unless LibBSON.bson_append_array_begin(handle, key, key.bytesize, child_handle)
       return false
     end
@@ -295,31 +295,31 @@ class BSON
     self
   end
 
-  alias Field = Nil         |
-               Int32        |
-               Int64        |
-               Binary       |
-               Bool         |
-               Float32      |
-               Float64      |
-               MinKey       |
-               MaxKey       |
-               ObjectId     |
-               String       |
-               Symbol       |
-               Time         |
-               Timestamp    |
-               Code         |
-               BSON         |
-               Regex        |
-               Array(Field) |
-               Hash(String, Field)
+  alias Field = Nil |
+                Int32 |
+                Int64 |
+                Binary |
+                Bool |
+                Float32 |
+                Float64 |
+                MinKey |
+                MaxKey |
+                ObjectId |
+                String |
+                Symbol |
+                Time |
+                Timestamp |
+                Code |
+                BSON |
+                Regex |
+                Array(Field) |
+                Hash(String, Field)
 
   def decode
     if array?
-      each_with_object([] of Field) {|v, res| res << decode_value(v.value)}
+      each_with_object([] of Field) { |v, res| res << decode_value(v.value) }
     else
-      each_pair.each_with_object({} of String => Field) {|pair, h| h[pair[0]] = decode_value(pair[1].value)}
+      each_pair.each_with_object({} of String => Field) { |pair, h| h[pair[0]] = decode_value(pair[1].value) }
     end
   end
 

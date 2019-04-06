@@ -10,7 +10,7 @@ _Beta_
 
 # Requirements
 
-- Crystal language version 0.20 and higher.
+- Crystal language version 0.27.2 and higher.
 - libmongoc version 1.1.0
 - libbson verion 1.1.0
 
