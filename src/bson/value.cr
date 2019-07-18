@@ -18,6 +18,23 @@ class BSON
     def value
       v = @handle.value
       case @handle.v_type
+      when LibBSON::Type::BSON_TYPE_BINARY
+        bytes = Bytes.new(v.v_binary.data, v.v_binary.len.to_i32)
+        subtype = case v.v_binary.sub_type
+        when LibBSON::SubType::BSON_SUBTYPE_BINARY
+          Binary::SubType::Binary
+        when LibBSON::SubType::BSON_SUBTYPE_FUNCTION
+          Binary::SubType::Function
+        when LibBSON::SubType::BSON_SUBTYPE_UUID
+          Binary::SubType::UUID
+        when LibBSON::SubType::BSON_SUBTYPE_MD5
+          Binary::SubType::MD5
+        when LibBSON::SubType::BSON_SUBTYPE_USER
+          Binary::SubType::User
+        else
+          raise "Deprecated binary types should not be used"
+        end
+        Binary.new(subtype, bytes)
       when LibBSON::Type::BSON_TYPE_EOD
         nil
       when LibBSON::Type::BSON_TYPE_DOUBLE
