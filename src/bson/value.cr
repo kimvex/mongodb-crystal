@@ -1,6 +1,8 @@
 require "./lib_bson"
 
 class BSON
+  alias ValueType = BSON | Binary | Code | MaxKey | MinKey | ObjectId | Symbol | Timestamp | Bool | Float64 | Int32 | Int64 | Regex | String | Time | Nil
+  
   class Value
     @handle : LibBSON::Value
 
