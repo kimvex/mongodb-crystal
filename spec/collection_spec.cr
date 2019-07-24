@@ -146,4 +146,15 @@ describe Mongo::Collection do
       col.name.should eq("new_name")
     end
   end
+  
+  it "should be able to insert and retrieve binary data" do
+    with_collection do |col|
+      binary = BSON::Binary.new(BSON::Binary::SubType::Binary, "binary".to_slice)
+      
+      col.insert({"name" => "Billy Bob Thornton", "val" => binary})
+      doc = col.find_one({"name" => "Billy Bob Thornton"}).as(BSON)
+      doc["val"].is_a?(BSON::Binary).should be_true
+      doc["val"].as(BSON::Binary).should eq(binary)
+    end
+  end
 end
