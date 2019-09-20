@@ -8,7 +8,16 @@ describe Mongo::Client do
     client.max_message_size.should be > 0
     client.max_bson_size.should be > 0
   end
-
+  
+  it "should be able to connect using a pooled connection" do
+    client_pool = Mongo::ClientPool.new("mongodb://localhost")
+    client = client_pool.pop
+    client.uri.string.should eq("mongodb://localhost")
+    client.max_message_size.should be > 0
+    client.max_bson_size.should be > 0    
+    client_pool.push(client)
+  end  
+  
   it "should be able to modify write_concern" do
     client = Mongo::Client.new("mongodb://localhost")
     client.write_concern.fsync.should be_false
