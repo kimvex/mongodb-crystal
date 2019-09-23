@@ -10,6 +10,8 @@ class Mongo::IndexOpt
   @weights : BSON?
   @default_language : String?
   @language_override : String?
+  @partial_filter_expression : BSON?
+  @collation : BSON?
 
   property background
   property unique
@@ -20,10 +22,13 @@ class Mongo::IndexOpt
   property weights
   property default_language
   property language_override
-
+  property partial_filter_expression
+  property collation
+  
   def initialize(@background = false, @unique = false, @name = nil,
                  @drop_dups = false, @sparse = false, @expire_after_seconds = 0,
-                 @weights = nil, @default_language = nil, @language_override = nil)
+                 @weights = nil, @default_language = nil, @language_override = nil,
+                 @partial_filter_expression = nil, @collation = nil)
     @opt = LibMongoC::IndexOpt.new
     LibMongoC.index_opt_init(pointerof(@opt))
   end
@@ -46,7 +51,12 @@ class Mongo::IndexOpt
     if language_override = @language_override
       @opt.language_override = language_override.to_unsafe
     end
-
+    if partial_filter_expression = @partial_filter_expression
+      @opt.partial_filter_expression = partial_filter_expression.to_unsafe
+    end
+    if collation = @collation
+      @opt.collation = collation.to_unsafe
+    end
     pointerof(@opt)
   end
 end
