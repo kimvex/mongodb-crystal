@@ -364,4 +364,19 @@ lib LibMongoC
   fun client_set_read_prefs = mongoc_client_set_read_prefs(client: Client, prefs: ReadPrefs)
   # fun client_set_ssl_opts = mongoc_client_set_ssl_opts(client: Client, opts: SSLOpt)
   fun client_get_gridfs = mongoc_client_get_gridfs(client: Client, db: UInt8*, prefix: UInt8*, error: BSONError*) : GridFS
+  # Connection Pool Support
+  type ClientPool = Void*
+  fun client_pool_new = mongoc_client_pool_new(uri: Uri) : ClientPool
+  fun client_pool_destroy = mongoc_client_pool_destroy (pool: ClientPool)
+  fun client_pool_pop = mongoc_client_pool_pop (pool: ClientPool) : Client
+  fun client_pool_push = mongoc_client_pool_push (pool: ClientPool, client : Client)
+  fun client_pool_try_pop = mongoc_client_pool_try_pop (pool: ClientPool) : Client
+  fun client_pool_max_size = mongoc_client_pool_max_size (pool: ClientPool,max_pool_size: UInt32)
+  fun client_pool_min_size = mongoc_client_pool_min_size (pool: ClientPool,min_pool_size: UInt32)
+  #fun client_pool_set_ssl_opts = mongoc_client_pool_set_ssl_opts (pool : ClientPool,opts: SSLOpt)
+  fun client_pool_set_error_api = mongoc_client_pool_set_error_api (pool: ClientPool, version: Int32) : Bool
+  fun client_pool_set_appname = mongoc_client_pool_set_appname (pool: ClientPool,appname: UInt8*) : Bool
+                                                                                                            
+                                                                                                            
+                                                                                                            
 end
