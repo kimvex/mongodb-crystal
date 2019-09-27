@@ -1,5 +1,5 @@
 name: mongo
-version: 0.1.2
+version: 0.2.1
 
 authors:
   - Jerome Gravel-Niquet <jeromegn@gmail.com>
@@ -15,6 +15,6 @@ description: |
   Library for Mongodb Driver of C.
 
 libraries:
-  libmongoc: 1.1.0
+  libmongoc: 1.15.0
 
 license: MIT
