@@ -148,7 +148,9 @@ lib LibMongoC
     language_override: UInt8*
     geo_options: Void* # FIXME
     storage_options: Void* #FIXME
-    padding: Void*[6]
+    partial_filter_expression: BSON
+    collation: BSON
+    padding: Void*[4]
   end
 
   fun index_opt_get_default = mongoc_index_opt_get_default(): IndexOpt*
