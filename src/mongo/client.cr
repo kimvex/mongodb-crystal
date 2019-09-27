@@ -180,3 +180,46 @@ class Mongo::Client
     @handle
   end
 end
+# Pool Struct Handler
+class Mongo::ClientPool
+  @handle : LibMongoC::ClientPool
+  def initialize(@handle : LibMongoC::ClientPool)
+    raise "invalid handle" unless @handle
+  end
+  # Creates a new Client using uri expressed as a String or Uri class instance.
+  def initialize(uri : String | Uri = "mongodb://localhost")
+    handle =
+      if uri.is_a?(String)
+        LibMongoC.client_pool_new(Mongo::Uri.new(uri))
+      else
+        LibMongoC.client_pool_new(uri)
+      end
+    initialize handle
+  end
+  def pop
+    Client.new(LibMongoC.client_pool_pop(self))
+  end
+  def push(client : Client)
+    LibMongoC.client_pool_push(self,client)
+  end
+  def try_pop
+    handle = LibMongoC.client_pool_try_pop(self)
+    if handle
+        Client.new(handle)
+    else
+        nil
+    end
+  end
+  def max_size=(size : UInt32)
+    LibMongoC.client_pool_max_size(self,size)
+  end
+  def min_size=(size : UInt32)
+    LibMongoC.client_pool_min_size(self,size)
+  end
+  def finalize
+    LibMongoC.client_pool_destroy(self)
+  end
+  def to_unsafe
+    @handle
+  end
+end
