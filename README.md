@@ -11,8 +11,8 @@ _Beta_
 # Requirements
 
 - Crystal language version 0.27.2 and higher.
-- libmongoc version 1.1.0
-- libbson verion 1.1.0
+- libmongoc version 1.15.0
+- libbson verion 1.15.0
 
 On Mac OSX use `homebrew` to install the required libraries:
 
@@ -20,7 +20,7 @@ On Mac OSX use `homebrew` to install the required libraries:
 $ brew install mongo-c
 ```
 
-On Linux you need to install `libmongoc-1.1-0` and `libbson-1.1-0` from your package manager or from source:
+On Linux you need to install `libmongoc-1.15-1` and `libbson-1.15-1` from your package manager or from source:
 
 [http://mongoc.org/libmongoc/current/installing.html](http://mongoc.org/libmongoc/current/installing.html)
 
