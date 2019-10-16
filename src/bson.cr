@@ -39,9 +39,9 @@ class BSON
     new(handle)
   end
 
-  protected def invalidate
-    finalize
+  def invalidate
     @valid = false
+    LibBSON.bson_destroy(@handle)
   end
 
   protected def handle
