@@ -107,7 +107,7 @@ class Mongo::GridFS::File < IO
   end
 
   # This function seeks within the underlying file.
-  def seek(amount, whence = LibC::SEEK_SET)
+  def seek(amount, whence)
     LibMongoC.gridfs_file_seek(self, amount.to_i64, whence).tap do
       check_error
     end
