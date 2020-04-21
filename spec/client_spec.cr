@@ -1,25 +1,18 @@
 require "../src/mongo"
 require "spec"
 
+CDB_STRING = "mongodb://core:core@ds015740.mlab.com:15740/core_test"
+
 describe Mongo::Client do
   it "should be able to connect to a server" do
-    client = Mongo::Client.new("mongodb://localhost")
-    client.uri.string.should eq("mongodb://localhost")
+    client = Mongo::Client.new(CDB_STRING)
+    client.uri.string.should eq(CDB_STRING)
     client.max_message_size.should be > 0
     client.max_bson_size.should be > 0
   end
-  
-  it "should be able to connect using a pooled connection" do
-    client_pool = Mongo::ClientPool.new("mongodb://localhost")
-    client = client_pool.pop
-    client.uri.string.should eq("mongodb://localhost")
-    client.max_message_size.should be > 0
-    client.max_bson_size.should be > 0    
-    client_pool.push(client)
-  end  
-  
+
   it "should be able to modify write_concern" do
-    client = Mongo::Client.new("mongodb://localhost")
+    client = Mongo::Client.new(CDB_STRING)
     client.write_concern.fsync.should be_false
     client.write_concern.fsync = true
     client.write_concern.fsync.should be_true
@@ -30,7 +23,7 @@ describe Mongo::Client do
   end
 
   it "should be able to modify read preferences" do
-    client = Mongo::Client.new("mongodb://localhost")
+    client = Mongo::Client.new(CDB_STRING)
     client.read_prefs.mode.should eq(LibMongoC::ReadMode::PRIMARY)
     tag = BSON.new
     tag["name"] = "my_tag"
@@ -45,5 +38,13 @@ describe Mongo::Client do
     client.read_prefs = read_prefs
     client.read_prefs.mode.should eq(LibMongoC::ReadMode::PRIMARY_PREFERRED)
   end
-end
 
+  it "should read default ssl opts" do
+    opts = Mongo.ssl_opt_get_default
+    if opts.is_a?(LibMongoC::SSLOpt)
+      opts.allow_invalid_hostname.should be_false
+    else
+      fail("expceted a sslopt object")
+    end
+  end
+end

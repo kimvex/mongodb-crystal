@@ -6,13 +6,13 @@ This library provides binding for MongoDB C Driver. The goal is to provide a dri
 
 # Status
 
-_Beta_
+_Release_
 
 # Requirements
 
-- Crystal language version 0.27.2 and higher.
-- libmongoc version 1.15.0
-- libbson verion 1.15.0
+- Crystal language version 0.33.0 and higher.
+- libmongoc version 1.15.0+
+- libbson verion 1.15.0+
 
 On Mac OSX use `homebrew` to install the required libraries:
 
@@ -20,7 +20,7 @@ On Mac OSX use `homebrew` to install the required libraries:
 $ brew install mongo-c
 ```
 
-On Linux you need to install `libmongoc-1.15-1` and `libbson-1.15-1` from your package manager or from source:
+On Linux you need to install `libmongoc-1.16-2` and `libbson-1.16-2` from your package manager or from source:
 
 [http://mongoc.org/libmongoc/current/installing.html](http://mongoc.org/libmongoc/current/installing.html)
 
@@ -28,6 +28,15 @@ On Linux/Ubuntu
 
 ```
   sudo apt install libmongoc-dev libmongoc-1.0-0 libmongoclient-dev
+```
+
+Or
+
+```
+wget https://github.com/mongodb/mongo-c-driver/releases/download/1.16.2/mongo-c-driver-1.16.2.tar.gz
+tar -zxvf mongo-c-driver-1.16.2.tar.gz && cd mongo-c-driver-1.16.2/
+cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF
+sudo make install
 ```
 
 ## Installation

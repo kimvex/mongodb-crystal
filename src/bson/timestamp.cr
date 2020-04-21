@@ -7,11 +7,22 @@ class BSON
 
     # @param timestamp epoch seconds
     # @param increment in seconds
-    def initialize(timestamp : Int, increment)
+    def initialize(timestamp : UInt32, increment)
       handle = LibBSON::Timestamp.new
       handle.ts = timestamp.to_u32
       handle.incr = increment.to_u32
       initialize(handle)
+    end
+
+    def to_json(json : JSON::Builder)
+      json.object do
+        json.field("$timestamp") do
+          json.object do
+            json.field "t", timestamp
+            json.field "i", increment
+          end
+        end
+      end
     end
 
     def timestamp

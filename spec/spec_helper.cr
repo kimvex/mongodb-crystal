@@ -1,10 +1,10 @@
 def create_client
-  Mongo::Client.new("mongodb://localhost")
+  Mongo::Client.new("mongodb://core:core@ds015740.mlab.com:15740/core_test?retryWrites=false")
 end
 
 def create_database
   client = create_client
-  client["my_db_#{Time.now.to_unix}"]
+  client["core_test"]
 end
 
 def create_collection

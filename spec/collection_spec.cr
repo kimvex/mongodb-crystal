@@ -18,16 +18,16 @@ describe Mongo::Collection do
       pipeline = [{"$match" => {"status" => "A"}},
                   {"$group" => {"_id" => "$cust_id", "total" => {"$sum" => "$amount"}}}].to_bson
       cur = col.aggregate(pipeline)
-      cur.to_a.to_s.should eq("[{ \"_id\" : \"B212\", \"total\" : 200 }, { \"_id\" : \"A123\", \"total\" : 750 }]")
+      cur.to_a.to_s.should eq("[{ \"_id\" : \"B212\", \"total\" : { \"$numberInt\" : \"200\" } }, { \"_id\" : \"A123\", \"total\" : { \"$numberInt\" : \"750\" } }]")
     end
   end
 
   it "should be able to drop a collection" do
     with_collection do |col|
       col.insert({"name" => "Bob"})
-      col.database.collection_names.includes?(col.name).should be_true
+      col.database.not_nil!.collection_names.includes?(col.name).should be_true
       col.drop
-      col.database.collection_names.includes?(col.name).should be_false
+      col.database.not_nil!.collection_names.includes?(col.name).should be_false
     end
   end
 
@@ -69,12 +69,10 @@ describe Mongo::Collection do
 
   it "should be able to insert in bulk" do
     with_collection do |col|
-
       docs = [{"name" => "Bob"}, {"name" => "Joe"}, {"name" => "Steve"}]
       col.insert_bulk docs
 
       col.count.should eq(3)
-
     end
   end
 
@@ -131,7 +129,6 @@ describe Mongo::Collection do
       obj["val"] = 42
       obj["type"] = "person"
       col.save(obj)
-
       doc = col.find({"name" => "counter"}).next
       fail "expected BSON" unless doc.is_a?(BSON)
       doc["val"].should eq(42)
@@ -142,19 +139,8 @@ describe Mongo::Collection do
   it "should be able to rename a collection" do
     with_collection do |col|
       col.insert({"name" => "Bob"})
-      col.rename(col.database.name, "new_name")
+      col.rename(col.database.not_nil!.name, "new_name")
       col.name.should eq("new_name")
-    end
-  end
-  
-  it "should be able to insert and retrieve binary data" do
-    with_collection do |col|
-      binary = BSON::Binary.new(BSON::Binary::SubType::Binary, "binary".to_slice)
-      
-      col.insert({"name" => "Billy Bob Thornton", "val" => binary})
-      doc = col.find_one({"name" => "Billy Bob Thornton"}).as(BSON)
-      doc["val"].is_a?(BSON::Binary).should be_true
-      doc["val"].as(BSON::Binary).should eq(binary)
     end
   end
 end

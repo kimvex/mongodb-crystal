@@ -4,13 +4,14 @@ require "./bson/*"
 
 class BSON
   @handle : LibBSON::BSON
-
+  @valid : Bool = false
+  @owned : Bool = true
   include Enumerable(Value)
   include Comparable(BSON)
 
-  def initialize(@handle : LibBSON::BSON)
-    @valid = true
+  def initialize(@handle : LibBSON::BSON, @owned : Bool = true)
     raise "invalid handle" unless @handle
+    @valid = true
   end
 
   def initialize
@@ -18,7 +19,7 @@ class BSON
   end
 
   def finalize
-    LibBSON.bson_destroy(@handle) if @valid
+    LibBSON.bson_destroy(@handle) if @valid && @owned
   end
 
   def self.from_json(json)
@@ -26,7 +27,12 @@ class BSON
     if handle.null? && error
       raise BSONError.new(pointerof(error))
     end
-    new(handle)
+    new(handle, true)
+  end
+
+  def self.not_initialized
+    ptr = Pointer(LibBSON::BSONHandle).malloc(1)
+    new(ptr, false)
   end
 
   def self.from_data(data : Slice(UInt8))
@@ -39,8 +45,9 @@ class BSON
     new(handle)
   end
 
-  protected def invalidate
-    finalize
+  def invalidate
+    LibBSON.bson_destroy(@handle) if @owned && @valid
+    @owned = false
     @valid = false
   end
 
@@ -55,6 +62,11 @@ class BSON
 
   def empty?
     count == 0
+  end
+
+  def to_json(json : JSON::Builder)
+    l = to_json
+    json.raw l
   end
 
   def to_json
@@ -205,34 +217,27 @@ class BSON
       else
         ""
       end
-
     LibBSON.bson_append_regex(handle, key, key.bytesize, value.source, options)
   end
 
   def append_document(key)
     child_handle = LibBSON.bson_new
-    unless LibBSON.bson_append_document_begin(handle, key, key.bytesize, child_handle)
-      return false
-    end
-    child = BSON.new(child_handle)
+    child = BSON.new child_handle
     begin
       yield child
+      LibBSON.bson_append_document(handle, key, key.bytesize, child_handle)
     ensure
-      LibBSON.bson_append_document_end(handle, child)
       child.invalidate
     end
   end
 
   def append_array(key)
     child_handle = LibBSON.bson_new
-    unless LibBSON.bson_append_array_begin(handle, key, key.bytesize, child_handle)
-      return false
-    end
     child = BSON.new(child_handle)
     begin
       yield ArrayAppender.new(child), child
+      LibBSON.bson_append_array(handle, key, key.bytesize, child_handle)
     ensure
-      LibBSON.bson_append_array_end(handle, child)
       child.invalidate
     end
   end

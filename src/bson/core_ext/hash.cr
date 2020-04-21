@@ -1,3 +1,5 @@
+require "json"
+
 class Hash(K, V)
   def to_bson(bson = BSON.new)
     each do |k, v|

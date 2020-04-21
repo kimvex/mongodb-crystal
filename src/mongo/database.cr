@@ -11,7 +11,11 @@ class Mongo::Database
   end
 
   def finalize
-    LibMongoC.database_destroy(self)
+    LibMongoC.database_destroy(@handle)
+  end
+
+  def watch(pipeline = BSON.new, options = BSON.new)
+    ChangeStream.new LibMongoC.database_watch(self, pipeline.to_bson, options.to_bson)
   end
 
   # Fetches the name of the database.
@@ -35,7 +39,7 @@ class Mongo::Database
 
   # This method shall create a new user with access to database.
   def add_user(username, password, roles = nil, custom_data = nil)
-    unless LibMongoC.database_add_user(self, username, password, roles.to_bson, custom_data.to_bson, out error)
+    unless LibMongoC.database_add_user(@handle, username, password, roles.to_bson, custom_data.to_bson, out error)
       raise BSON::BSONError.new(pointerof(error))
     end
   end
@@ -45,6 +49,7 @@ class Mongo::Database
     cmd = BSON.new
     cmd["usersInfo"] = 1
     res = command_simple(cmd)
+    puts res.inspect
     if res && (users = res["users"]) && users.is_a?(BSON)
       users
     end
@@ -54,7 +59,7 @@ class Mongo::Database
   def command(command, fields = BSON.new, flags = LibMongoC::QueryFlags::NONE,
               skip = 0, limit = 0, batch_size = 0, prefs = nil)
     Cursor.new LibMongoC.database_command(self, flags, skip.to_u32, limit.to_u32, batch_size.to_u32,
-                                          command.to_bson, fields.to_bson, prefs)
+      command.to_bson, fields.to_bson, prefs)
   end
 
   # This method shall execute a command on a database.
@@ -71,7 +76,9 @@ class Mongo::Database
     unless LibMongoC.database_command_simple(self, command.to_bson, prefs, out reply, out error)
       raise BSON::BSONError.new(pointerof(error))
     end
-    BSON.copy_from pointerof(reply)
+    repl = BSON.copy_from pointerof(reply)
+    LibBSON.bson_destroy(pointerof(reply))
+    repl
   end
 
   # This method attempts to drop a database on the MongoDB server.
@@ -95,11 +102,11 @@ class Mongo::Database
 
   # This method create a new collection named `name`.
   def create_collection(name, options = nil)
-   col = LibMongoC.database_create_collection(self, name, options, out error)
-   unless col
+    col = LibMongoC.database_create_collection(self, name, options, out error)
+    unless col
       raise BSON::BSONError.new(pointerof(error))
-   end
-   Collection.new self, col
+    end
+    Collection.new self, col
   end
 
   def gridfs(prefix = "fs")
